@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define COUNT 1  /* Number of sudokus to generate */
-#define SHUFF 10     /* Number of times to shuffle before printing */
-#define HINTS 20     /* Approximate percentage of cells with initial hints */
+#define SHUFF 10 /* Number of times to shuffle before printing */
+#define HINTS 20 /* Approximate percentage of cells with initial hints */
 
 /*
 ==============================================
@@ -295,36 +294,33 @@ Puzzle *create_puzzle(Puzzle *puzzle) {
   srand(time(NULL));
 
   int i, j, swap, trio;
+  for(j=0; j<SHUFF; j++){
 
-  for(i=0; i<COUNT; i++){
-    for(j=0; j<SHUFF; j++){
+    trio = (rand() % 3)*3;
+    swap = rand() & 1;
 
-      trio = (rand() % 3)*3;
-      swap = rand() & 1;
+    switch(rand() % 6){
+      /* swap rows */
+      case 0:
+        swap_row(trio+0, swap ? trio+1 : trio+2);
+        break;
+      case 1:
+        swap_row(trio+1, swap ? trio+0 : trio+2);
+        break;
+      case 2:
+        swap_row(trio+2, swap ? trio+0 : trio+1);
+        break;
 
-      switch(rand() % 6){
-        /* swap rows */
-        case 0:
-          swap_row(trio+0, swap ? trio+1 : trio+2);
-          break;
-        case 1:
-          swap_row(trio+1, swap ? trio+0 : trio+2);
-          break;
-        case 2:
-          swap_row(trio+2, swap ? trio+0 : trio+1);
-          break;
-
-        /* swap cols */
-        case 3:
-          swap_col(trio+0, swap ? trio+1 : trio+2);
-          break;
-        case 4:
-          swap_col(trio+1, swap ? trio+0 : trio+2);
-          break;
-        case 5:
-          swap_col(trio+2, swap ? trio+0 : trio+1);
-          break;
-      }
+      /* swap cols */
+      case 3:
+        swap_col(trio+0, swap ? trio+1 : trio+2);
+        break;
+      case 4:
+        swap_col(trio+1, swap ? trio+0 : trio+2);
+        break;
+      case 5:
+        swap_col(trio+2, swap ? trio+0 : trio+1);
+        break;
     }
   }
 
@@ -334,7 +330,6 @@ Puzzle *create_puzzle(Puzzle *puzzle) {
   }
 
   return puzzle;
-
 }
 
 void swap_row(int from, int to)
