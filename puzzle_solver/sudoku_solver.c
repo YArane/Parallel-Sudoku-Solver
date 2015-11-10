@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define COUNT 1  /* Number of sudokus to generate */
+#define SHUFF 10     /* Number of times to shuffle before printing */
+#define HINTS 20     /* Approximate percentage of cells with initial hints */
 
 /*
 ==============================================
@@ -23,15 +28,24 @@ Puzzle *init_puzzle(int n);
 void print_puzzle(Puzzle *puzzle);
 int puzzle_has_contradiction(int row, int col, Puzzle *puzzle);
 Cell *get_cell(int row, int col, Puzzle *puzzle);
-Puzzle *fill_puzzle_with_values(Puzzle *puzzle);
+void set_cell_value(int row, int col, Puzzle *puzzle, int new_val);
+int get_cell_value(int row, int col, Puzzle *puzzle);
 
 /* CELL METHODS */
 
 Cell *init_cell(int value, int n);
 
+/* PUZZLE GENERATOR METHODS */
+
+Puzzle *create_puzzle(Puzzle *puzzle);
+void swap_row(int from, int to);
+void swap_col(int from, int to);
+
+/* MAIN METHOD */
+
 int main(int argc, char **argv) {
   Puzzle *puzzle = init_puzzle(9);
-  puzzle = fill_puzzle_with_values(puzzle);
+  puzzle = create_puzzle(puzzle);
   print_puzzle(puzzle);
 
   int has_contradiction = puzzle_has_contradiction(5, 5, puzzle);
@@ -84,19 +98,6 @@ Puzzle *init_puzzle(int n){
   return puzzle;
 }
 
-// Only for testing! Doesn't build a real sudoku puzzle
-Puzzle *fill_puzzle_with_values(Puzzle *puzzle) {
-  int i, size = puzzle->size;
-  for (i = 0; i < size*size; i++) {
-    if (i % 3 == 0) {
-      (puzzle->cells[i]).value = -1;
-    } else {
-      (puzzle->cells[i]).value = i;
-    }
-  } 
-  return puzzle;
-}
-
 /* 
  * Function: get_cell
  * -------------------
@@ -115,6 +116,17 @@ Cell *get_cell(int row, int col, Puzzle *puzzle) {
   int size = puzzle->size;
   Cell *cell = &puzzle->cells[size * row + col];
   return cell;
+}
+
+int get_cell_value(int row, int col, Puzzle *puzzle) {
+  int size = puzzle->size;
+  int val = puzzle->cells[size * row + col].value;
+  return val; 
+}
+
+void set_cell_value(int row, int col, Puzzle *puzzle, int new_val) {
+  int size = puzzle->size;
+  puzzle->cells[size * row + col].value = new_val;
 }
 
 /* 
@@ -249,5 +261,101 @@ Cell *init_cell(int value, int n){
   cell->value = value;
   cell->possibility_list = list;
   return cell;
+}
+
+/*
+==============================
+=== PUZZLE GENERATOR CODE ====
+==============================
+*/
+
+void swap_row(int from, int to);
+void swap_col(int from, int to);
+void print_mx();
+
+static int source[81] ={
+  1,3,4,5,2,8,6,9,7,
+  2,5,6,7,9,1,3,4,8,
+  7,8,9,3,4,6,1,2,5,
+  3,1,2,4,6,7,5,8,9,
+  5,4,7,9,8,3,2,1,6,
+  9,6,8,1,5,2,7,3,4,
+  4,7,5,2,1,9,8,6,3,
+  8,9,1,6,3,5,4,7,2,
+  6,2,3,8,7,4,9,5,1
+};
+
+Puzzle *create_puzzle(Puzzle *puzzle) {
+  srand(time(NULL));
+
+  int i, j, swap, trio;
+
+  for(i=0; i<COUNT; i++){
+    for(j=0; j<SHUFF; j++){
+
+      trio = (rand() % 3)*3;
+      swap = rand() & 1;
+
+      switch(rand() % 6){
+        /* swap rows */
+        case 0:
+          swap_row(trio+0, swap ? trio+1 : trio+2);
+          break;
+        case 1:
+          swap_row(trio+1, swap ? trio+0 : trio+2);
+          break;
+        case 2:
+          swap_row(trio+2, swap ? trio+0 : trio+1);
+          break;
+
+        /* swap cols */
+        case 3:
+          swap_col(trio+0, swap ? trio+1 : trio+2);
+          break;
+        case 4:
+          swap_col(trio+1, swap ? trio+0 : trio+2);
+          break;
+        case 5:
+          swap_col(trio+2, swap ? trio+0 : trio+1);
+          break;
+      }
+    }
+  }
+
+  int size = puzzle->size;
+  for (i = 0; i < size * size; i++) {
+    puzzle->cells[i].value = source[i];
+  }
+
+  return puzzle;
+
+}
+
+void swap_row(int from, int to)
+{
+  int *ptr1, *ptr2, i, temp;
+  ptr1 = source+(9*from);
+  ptr2 = source+(9*to);
+  for(i=0; i<9; i++){
+    temp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = temp;
+    ptr1++; 
+    ptr2++;
+  }
+}
+
+void swap_col(int from, int to)
+{
+  int *ptr1, *ptr2, i, temp;
+  ptr1 = source+from;
+  ptr2 = source+to;
+  for(i=0; i<9; i++){
+    temp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = temp;
+    ptr1+=9;
+    ptr2+=9;
+  }
 }
 
