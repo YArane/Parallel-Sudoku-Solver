@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+==============================================
+===== SEE THE README FOR IMPORTANT INFO ======
+==============================================
+*/
+
 typedef struct Cell{
   int value;
   int *possibility_list;
@@ -17,6 +23,7 @@ Puzzle *init_puzzle(int n);
 void print_puzzle(Puzzle *puzzle);
 int puzzle_has_contradiction(int row, int col, Puzzle *puzzle);
 Cell *get_cell(int row, int col, Puzzle *puzzle);
+Puzzle *fill_puzzle_with_values(Puzzle *puzzle);
 
 /* CELL METHODS */
 
@@ -24,12 +31,12 @@ Cell *init_cell(int value, int n);
 
 int main(int argc, char **argv) {
   Puzzle *puzzle = init_puzzle(9);
+  puzzle = fill_puzzle_with_values(puzzle);
   print_puzzle(puzzle);
 
   int has_contradiction = puzzle_has_contradiction(5, 5, puzzle);
 
   printf("has contra %d\n", has_contradiction);
-
   return 0;
 }
 
@@ -73,12 +80,20 @@ Puzzle *init_puzzle(int n){
     return NULL;
   }
 
-  int i;
-  for (i = 0; i < n*n; i++) {
-    (puzzle->cells[i]).value = i;
-  }
-
   printf("Finished initializing Puzzle.\n");
+  return puzzle;
+}
+
+// Only for testing! Doesn't build a real sudoku puzzle
+Puzzle *fill_puzzle_with_values(Puzzle *puzzle) {
+  int i, size = puzzle->size;
+  for (i = 0; i < size*size; i++) {
+    if (i % 3 == 0) {
+      (puzzle->cells[i]).value = -1;
+    } else {
+      (puzzle->cells[i]).value = i;
+    }
+  } 
   return puzzle;
 }
 
@@ -144,24 +159,26 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
     square_col = 6;
   }
 
-  int i, j, k, traverse_count;
+  int i, j, k, traverse_count, row_val, col_val, grid_val;
   j = square_row;
   k = square_col;
   traverse_count = 0;
   for (i = 0; i < size; i++) {
-    printf("iter\n");
     // check all elements on row
-    if (get_cell(row, i, puzzle)->value == newest_element_value && i != col) {
+    row_val = get_cell(row, i, puzzle)->value;
+    if (row_val != -1 && row_val == newest_element_value && i != col) {
       return 1;
     }
 
     //check all elements on col
-    if (get_cell(i, col, puzzle)->value == newest_element_value && i != row) {
+    col_val = get_cell(i, col, puzzle)->value;
+    if (col_val != -1 && !col_val && col_val == newest_element_value && i != row) {
       return 1;
     }
 
     //check 3x3 square
-    if (get_cell(j, k, puzzle)->value == newest_element_value && j != row && k != col) {
+    grid_val = get_cell(j, k, puzzle)->value;
+    if (row_val != -1 && !grid_val && grid_val == newest_element_value && j != row && k != col) {
       return 1;
     }
 
@@ -179,6 +196,10 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
 
 }
 
+
+/*
+ * Prints the passed puzzle
+ */
 void print_puzzle(Puzzle *puzzle) {
 
   printf("About to print Puzzle.\n");
