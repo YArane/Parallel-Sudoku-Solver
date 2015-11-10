@@ -269,6 +269,12 @@ Cell *init_cell(int value, int n){
 ==============================
 */
 
+/*
+You shouldn't worry about what's going on here. 
+The only method that matters is create_puzzle, which
+populates the Puzzle object with a valid solved puzzle.
+*/
+
 void swap_row(int from, int to);
 void swap_col(int from, int to);
 void print_mx();
