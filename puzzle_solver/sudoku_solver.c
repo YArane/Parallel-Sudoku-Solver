@@ -15,7 +15,8 @@ typedef struct Puzzle{
 
 Puzzle *init_puzzle(int n);
 void print_puzzle(Puzzle *puzzle);
-int *puzzle_has_contradiction(int row, int col, Puzzle *puzzle);
+int puzzle_has_contradiction(int row, int col, Puzzle *puzzle);
+Cell *get_cell(int row, int col, Puzzle *puzzle);
 
 /* CELL METHODS */
 
@@ -25,7 +26,9 @@ int main(int argc, char **argv) {
   Puzzle *puzzle = init_puzzle(9);
   print_puzzle(puzzle);
 
-  puzzle_has_contradiction(5, 5, puzzle);
+  int has_contradiction = puzzle_has_contradiction(5, 5, puzzle);
+
+  printf("has contra %d\n", has_contradiction);
 
   return 0;
 }
@@ -109,19 +112,70 @@ Cell *get_cell(int row, int col, Puzzle *puzzle) {
  * col: the col that contains the cell to be checked for contradition
  * size: number of elements in a row/col of the puzzle
  *
- * returns: the pointer to the puzzle
+ * returns: 1 if there is a contradiction, 0 otherwise
  *
  */
-int *puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
+int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
 
   Cell *newest_element = get_cell(row, col, puzzle);
 
-  printf("Cell Value %d\n", newest_element->value);
+  int newest_element_value = newest_element->value;
+  int size = puzzle->size;
+  printf("Cell Value %d\n", newest_element_value);
 
-  // int i;
-  // for (i = 0; i < size; i++) {
+  // used to find the 3x3 square that will be checked for validity
+  //TODO: probably not the best way to check square validity, but it works!
+  int square_row, square_col;
+  if (row < 3) {
+    square_row = 0;
+    //top 3 blocks
+  } else if (row >= 3 && row < 6) {
+    square_row = 3;
+  } else {
+    square_row = 6;
+  }
 
-  // }
+  if (col < 3) {
+    square_col = 0;
+    //top 3 blocks
+  } else if (row >= 3 && row < 6) {
+    square_col = 3;
+  } else {
+    square_col = 6;
+  }
+
+  int i, j, k, traverse_count;
+  j = square_row;
+  k = square_col;
+  traverse_count = 0;
+  for (i = 0; i < size; i++) {
+    printf("iter\n");
+    // check all elements on row
+    if (get_cell(row, i, puzzle)->value == newest_element_value && i != col) {
+      return 1;
+    }
+
+    //check all elements on col
+    if (get_cell(i, col, puzzle)->value == newest_element_value && i != row) {
+      return 1;
+    }
+
+    //check 3x3 square
+    if (get_cell(j, k, puzzle)->value == newest_element_value && j != row && k != col) {
+      return 1;
+    }
+
+    traverse_count++;
+    if (traverse_count > 2) {
+      j = j + 1;
+      k = square_col;
+      traverse_count = 0;
+    } else {
+      k++;
+    }
+  }
+
+  return 0;
 
 }
 
