@@ -11,24 +11,36 @@
 ==============================================
 */
 
-typedef struct Cell{
+typedef struct Cell {
   int value;
   int *possibility_list;
 } Cell;
 
 typedef struct Puzzle{
   int size;
+  int number_of_empty_cells;
   Cell *cells;
 } Puzzle;
+
+typedef struct TreeNode {
+  int val;
+  int row;
+  int col;
+  struct TreeNode *children_list;
+} TreeNode;
 
 /* PUZZLE METHODS */
 
 Puzzle *init_puzzle(int n);
 void print_puzzle(Puzzle *puzzle);
+void fill_possibility_lists(Puzzle *puzzle);
 int puzzle_has_contradiction(int row, int col, Puzzle *puzzle);
 Cell *get_cell(int row, int col, Puzzle *puzzle);
 void set_cell_value(int row, int col, Puzzle *puzzle, int new_val);
 int get_cell_value(int row, int col, Puzzle *puzzle);
+int get_cell_with_least_possibilities(Puzzle *puzzle);
+void *find_square_row_and_col(int row, int col, int *square_row, int *square_col, Puzzle *puzzle);
+void print_possibility_list(int row, int col, Puzzle *puzzle);
 
 /* CELL METHODS */
 
@@ -39,15 +51,22 @@ Cell *init_cell(int value, int n);
 Puzzle *create_puzzle(Puzzle *puzzle);
 void swap_row(int from, int to);
 void swap_col(int from, int to);
+void insert_some_empty_cells(Puzzle *puzzle);
+
+/* TREE METHODS */
 
 /* MAIN METHOD */
 
 int main(int argc, char **argv) {
   Puzzle *puzzle = init_puzzle(9);
   puzzle = create_puzzle(puzzle);
+  insert_some_empty_cells(puzzle);
+  fill_possibility_lists(puzzle);
   print_puzzle(puzzle);
 
   int has_contradiction = puzzle_has_contradiction(5, 5, puzzle);
+
+  print_possibility_list(0, 0, puzzle);
 
   printf("has contra %d\n", has_contradiction);
   return 0;
@@ -89,8 +108,13 @@ Puzzle *init_puzzle(int n){
   puzzle->size = n;
 
   if (!(puzzle->cells = malloc(n * n * sizeof(Cell)))) {
-    printf("erorr allocating cells for puzzle.\n");
+    printf("error allocating cells for puzzle.\n");
     return NULL;
+  }  
+
+  int i;
+  for (i = 0; i < n * n; i++) {
+    puzzle->cells[i] = *init_cell(-1, n);
   }
 
   printf("Finished initializing Puzzle.\n");
@@ -128,6 +152,29 @@ void set_cell_value(int row, int col, Puzzle *puzzle, int new_val) {
   puzzle->cells[size * row + col].value = new_val;
 }
 
+
+void *find_square_row_and_col(int row, int col, int *square_row, int *square_col, Puzzle *puzzle) {
+
+  if (row < 3) {
+    *square_row = 0;
+    //top 3 blocks
+  } else if (row >= 3 && row < 6) {
+    *square_row = 3;
+  } else {
+    *square_row = 6;
+  }
+
+  if (col < 3) {
+    *square_col = 0;
+    //top 3 blocks
+  } else if (row >= 3 && row < 6) {
+    *square_col = 3;
+  } else {
+    *square_col = 6;
+  }
+
+}
+
 /* 
  * Function: puzzle_has_contradiction
  * -------------------
@@ -152,23 +199,7 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
   // used to find the 3x3 square that will be checked for validity
   //TODO: probably not the best way to check square validity, but it works!
   int square_row, square_col;
-  if (row < 3) {
-    square_row = 0;
-    //top 3 blocks
-  } else if (row >= 3 && row < 6) {
-    square_row = 3;
-  } else {
-    square_row = 6;
-  }
-
-  if (col < 3) {
-    square_col = 0;
-    //top 3 blocks
-  } else if (row >= 3 && row < 6) {
-    square_col = 3;
-  } else {
-    square_col = 6;
-  }
+  find_square_row_and_col(row, col, &square_row, &square_col, puzzle);
 
   int i, j, k, traverse_count, row_val, col_val, grid_val;
   j = square_row;
@@ -207,6 +238,70 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
 
 }
 
+void fill_possibility_lists(Puzzle *puzzle) {
+  int row, col, i, j, k, square_row, square_col, row_val, col_val, grid_val, traverse_count;
+  int size = puzzle->size;
+  Cell target_cell;
+
+  int valid_possibilities[size + 1];
+
+  for (row = 0; row < size; row++) {
+    for (col = 0; col < size; col++) {
+
+      for (i = 0; i < size + 1; i++) valid_possibilities[i] = 1;
+      
+      target_cell = puzzle->cells[size * row + col];
+      if (target_cell.value != -1) {
+        // Don't find possibility list for already filled in cells
+        continue;
+      }
+
+      find_square_row_and_col(row, col, &square_row, &square_col, puzzle);
+
+      j = square_row;
+      k = square_col;
+      traverse_count = 0;
+      for (i = 0; i < size; i++) {
+        // Not available possibilities are crossed out by filling their cell in
+        // valid_possibilities[] with 0
+
+        // check all elements on row
+        row_val = get_cell(row, i, puzzle)->value;
+        if (row_val != -1) {
+          valid_possibilities[row_val] = 0;
+        }
+
+        //check all elements on col
+        col_val = get_cell(i, col, puzzle)->value;
+        if (col_val != -1) {
+          valid_possibilities[col_val] = 0;
+        }
+
+        //check 3x3 square
+        grid_val = get_cell(j, k, puzzle)->value;
+        if (row_val != -1) {
+          valid_possibilities[grid_val] = 0;
+        }
+
+        traverse_count++;
+        if (traverse_count > 2) {
+          j = j + 1;
+          k = square_col;
+          traverse_count = 0;
+        } else {
+          k++;
+        }
+      }
+
+      // Possibility list at 0 is meaningless, does not represent anything
+      target_cell.possibility_list[0] = 0;
+      for (i = 1; i < size + 1; i++) {
+        target_cell.possibility_list[i] = valid_possibilities[i];
+      }
+
+    }
+  }
+}
 
 /*
  * Prints the passed puzzle
@@ -226,6 +321,15 @@ void print_puzzle(Puzzle *puzzle) {
       counter = 0;
     }
   }
+}
+
+void print_possibility_list(int row, int col, Puzzle *puzzle) {
+  int i, size = puzzle->size;
+  int possibility;
+  for (i = 0; i < size + 1; i++) {
+    printf("%d ", get_cell(row, col, puzzle)->possibility_list[i]);
+  }
+  printf("\n");
 }
 
 /*
@@ -254,11 +358,11 @@ Cell *init_cell(int value, int n){
   }
   // check malloc of possibility pointer
   int *list;
-  if(!(list = malloc(sizeof(int)*n))){
+  if(!(cell->possibility_list = malloc((n + 1) * sizeof(int)))){
     printf("error allocating possibility list.\n");
   }
+
   cell->value = value;
-  cell->possibility_list = list;
   return cell;
 }
 
@@ -330,6 +434,21 @@ Puzzle *create_puzzle(Puzzle *puzzle) {
   }
 
   return puzzle;
+}
+
+// For testing
+void insert_some_empty_cells(Puzzle *puzzle) {
+  set_cell_value(0,0,puzzle,-1);
+  set_cell_value(0,1,puzzle,-1);
+  set_cell_value(1,0,puzzle,-1);
+  set_cell_value(7,1,puzzle,-1);
+  set_cell_value(4,2,puzzle,-1);
+  set_cell_value(0,8,puzzle,-1);
+  set_cell_value(3,4,puzzle,-1);
+  set_cell_value(1,1,puzzle,-1);
+  set_cell_value(2,3,puzzle,-1);
+  // set_cell_value(4,4,puzzle,-1);
+  // set_cell_value(1,3,puzzle,-1);
 }
 
 void swap_row(int from, int to)
