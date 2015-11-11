@@ -14,22 +14,21 @@
  * returns: the pointer to the cell
  *
  */
-
 Cell *init_cell(int value, int n){
-        Cell *cell;
-        // check malloc of struct
-        if(!(cell = malloc(sizeof(Cell)))){
-            printf("error allocating cell.\n");
-            return NULL;
-        }
-        // check malloc of possibility pointer
-        int *list;
-        if(!(list = malloc(sizeof(int)*n))){
-            printf("error allocating possibility list.\n");
-        }
-        cell->value = value;
-        cell->possibility_list = list;
-        return cell;
+  Cell *cell;
+  // check malloc of struct
+  if(!(cell = malloc(sizeof(Cell)))){
+    printf("error allocating cell.\n");
+    return NULL;
+  }
+  // check malloc of possibility pointer
+  int *list;
+  if(!(cell->possibility_list = malloc((n + 1) * sizeof(int)))){
+    printf("error allocating possibility list.\n");
+  }
+
+  cell->value = value;
+  return cell;
 }
 
 
