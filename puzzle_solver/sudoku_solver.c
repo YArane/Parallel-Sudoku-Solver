@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+//#include "../puzzle_structs/puzzle_generator.h"
 
 #define SHUFF 10 /* Number of times to shuffle before printing */
 #define HINTS 20 /* Approximate percentage of cells with initial hints */
