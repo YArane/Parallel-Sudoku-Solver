@@ -1,8 +1,5 @@
-program : test.o
-	gcc -o program test.o ../puzzle_structs/puzzle.o ../puzzle_structs/cell.o
-
-test.o : test.c
-	gcc -c test.c
+decision_tree.o : decision_tree.c decision_tree.h
+	gcc -c decision_tree.c
 
 clean :
-	rm -f program test.o
+	rm -f program test.o decision_tree.o
