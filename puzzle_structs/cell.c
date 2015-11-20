@@ -32,3 +32,10 @@ Cell *init_cell(int value, int n){
 }
 
 
+void fill_possibilities_with_zeros(Cell *cell){
+    int i;
+    int *list = cell->possibility_list;
+    for(i=0;i<9;i++){
+            list[i] = 0;
+    }
+}

@@ -53,6 +53,9 @@ Puzzle *create_puzzle(Puzzle *puzzle) {
   int size = puzzle->size;
   for (i = 0; i < size * size; i++) {
     puzzle->cells[i].value = source[i];
+    puzzle->cells[i].row = i/size;
+    puzzle->cells[i].col = i%size;
+
   }
 
   return puzzle;

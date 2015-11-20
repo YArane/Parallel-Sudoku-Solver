@@ -52,7 +52,7 @@ void *find_square_row_and_col(int row, int col, int *square_row, int *square_col
   if (col < 3) {
     *square_col = 0;
     //top 3 blocks
-  } else if (row >= 3 && row < 6) {
+  } else if (col >= 3 && col < 6) {
     *square_col = 3;
   } else {
     *square_col = 6;
@@ -114,9 +114,14 @@ int get_cell_value(int row, int col, Puzzle *puzzle) {
  *
  */
 void set_cell_value(int row, int col, Puzzle *puzzle, int new_val) {
-  get_cell(row, col, puzzle)->value = new_val;
-/*  int size = puzzle->size;
-  puzzle->cells[size * row + col].value = new_val;*/
+  printf("SETTING CELL [%d][%d] to %d\n", row, col, new_val);
+  Cell *cell = get_cell(row, col, puzzle);
+  cell->value = new_val;
+  int i;
+  for(i=0;i<=puzzle->size;i++){
+        cell->possibility_list[i] = 0;
+  }
+  fill_possibility_lists(puzzle);
 }
 
 /* 
@@ -181,21 +186,60 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
   return 0;
 }
 
+int is_obvious(Cell *cell){
+    int i;
+    int temp = 0;
+    for(i=1;i<sizeof(cell->possibility_list);i++){
+        if(cell->possibility_list[i] == 1){
+            if(temp == 0){
+                temp = i;
+            }else{
+                return -1;
+            }
+        }
+    }
+    return temp;
+}
+
+void fill_in_obvious_cells(Puzzle *puzzle){
+   int i, j;
+   for(i=0;i<puzzle->size;i++){
+        for(j=0;j<puzzle->size;j++){
+            if(get_cell_value(i, j, puzzle) != -1)
+                    continue;
+            int value = is_obvious(get_cell(i, j, puzzle));
+            if(value > 0){
+                    printf("Ovbious cell: [%d][%d], value: %d\n", i, j, value);
+                    set_cell_value(i, j, puzzle, value);
+                    fill_possibilities_with_zeros(get_cell(i, j, puzzle));
+                    fill_in_obvious_cells(puzzle);
+                    return;
+            }
+        }
+   }
+}
+
 void fill_possibility_lists(Puzzle *puzzle) {
   int row, col, i, j, k, square_row, square_col, row_val, col_val, grid_val, traverse_count;
   int size = puzzle->size;
   Cell target_cell;
+
+    int error = 0;
 
   int valid_possibilities[size + 1];
 
   for (row = 0; row < size; row++) {
     for (col = 0; col < size; col++) {
 
+    if(row ==2 && col == 4) error = 1; else error = 0;
       for (i = 0; i < size + 1; i++) valid_possibilities[i] = 1;
       
       target_cell = puzzle->cells[size * row + col];
       if (target_cell.value != -1) {
         // Don't find possibility list for already filled in cells
+        /*for(i=0;i<size;i++){
+            valid_possibilities[i] = 0;
+        }*/
         continue;
       }
 
@@ -204,6 +248,8 @@ void fill_possibility_lists(Puzzle *puzzle) {
       j = square_row;
       k = square_col;
       traverse_count = 0;
+
+
       for (i = 0; i < size; i++) {
         // Not available possibilities are crossed out by filling their cell in
         // valid_possibilities[] with 0
@@ -222,7 +268,8 @@ void fill_possibility_lists(Puzzle *puzzle) {
 
         //check 3x3 square
         grid_val = get_cell(j, k, puzzle)->value;
-        if (row_val != -1) {
+        //if (row_val != -1) {
+        if(grid_val != -1){
           valid_possibilities[grid_val] = 0;
         }
 
@@ -249,7 +296,8 @@ void fill_possibility_lists(Puzzle *puzzle) {
 void print_possibility_list(int row, int col, Puzzle *puzzle) {
   int i, size = puzzle->size;
   int possibility;
-  for (i = 0; i < size + 1; i++) {
+  printf("[%d][%d] value: %d  ", row, col, get_cell(row, col, puzzle)->value);
+  for (i = 1; i < size + 1; i++) {
     printf("%d ", get_cell(row, col, puzzle)->possibility_list[i]);
   }
   printf("\n");
@@ -265,17 +313,91 @@ void print_possibility_list(int row, int col, Puzzle *puzzle) {
  */
 void print_puzzle(Puzzle *puzzle) {
 
+  char *space = " ";
   printf("About to print Puzzle.\n");
 
   int size = puzzle->size;
 
   int i, counter = 0;
+  int row_counter = 0;
+  printf("%*s", 4, space);
   for (i = 0; i < size * size; i++) {
-    printf("%d ", puzzle->cells[i].value);
+    if(puzzle->cells[i].value == -1){
+        printf("[] ");
+    }else{
+        printf(" %d ", puzzle->cells[i].value);
+    }
     counter++;
+    if(counter%3 == 0){
+        printf("|");
+    }
     if (counter == 9) {
+      row_counter++;
+      if(row_counter%3 == 0){
+            printf("\n");
+            printf("%*s", 4, space);
+            printf("------------------------------");
+      }
       printf("\n");
+      printf("%*s", 4, space);
       counter = 0;
     }
   }
+  printf("\n");
 }
+
+int get_cell_row(Puzzle *puzzle, Cell *cell){
+    int i, j;
+    for(i=0;i<puzzle->size;i++){
+        for(j=0;j<puzzle->size;j++){
+            if(get_cell(i, j, puzzle) == cell)
+                    return i;
+        }
+    }
+    return -1;
+}
+
+int get_cell_column(Puzzle *puzzle, Cell *cell){
+    int i, j;
+   for(i=0;i<puzzle->size;i++){
+        for(j=0;j<puzzle->size;j++){
+            if(get_cell(i, j, puzzle) == cell)
+                    return j;
+        }
+    }
+    return -1;
+}
+void print_puzzle_by_level(Puzzle *puzzle, int level) {
+ 
+   char *space = " ";
+   printf("About to print Puzzle.\n");
+ 
+   int size = puzzle->size;
+ 
+   int i, counter = 0;
+   int row_counter = 0;
+   printf("%*s", level*4, space);
+   for (i = 0; i < size * size; i++) {
+     if(puzzle->cells[i].value == -1){
+         printf("[] ");
+     }else{
+         printf(" %d ", puzzle->cells[i].value);
+     }
+     counter++;
+     if(counter%3 == 0){
+         printf("|");
+     }
+     if (counter == 9) {
+       row_counter++;
+       if(row_counter%3 == 0){
+             printf("\n");
+             printf("%*s", level*4, space);
+             printf("------------------------------");
+       }
+       printf("\n");
+       printf("%*s", level*4, space);
+       counter = 0;
+     }
+   }
+   printf("\n");
+ }

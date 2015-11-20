@@ -18,9 +18,12 @@ TreeNode *init_node(Cell *cell){
 
 int number_of_possibilities(Cell *cell){
     int *possibility_list = cell->possibility_list;
-    
+
+	printf("size of possibility_list: %lu\n", sizeof(possibility_list));
+
+    printf("__> %d\n", (int)(sizeof(possibility_list)/(sizeof(int)*2)));
     int i, count=0;
-    for(i=1;i<sizeof(possibility_list)/sizeof(int);i++){
+    for(i=1;i<(int)sizeof(possibility_list);i++){
         if(possibility_list[i])
                 count++;
     }
@@ -30,6 +33,7 @@ int number_of_possibilities(Cell *cell){
 void populate_children(TreeNode *node){
     Cell *cell = node->cell;
     int possibilities = number_of_possibilities(cell);
+    printf("number of possibilities for cell %d is %d\n", cell->value, possibilities);
     TreeNode *children;
 
     if(!(children = malloc(sizeof(TreeNode)*possibilities))){
@@ -39,7 +43,8 @@ void populate_children(TreeNode *node){
     int i, j;
     for(i=0, j=1;i<possibilities;i++, j++)
         if(cell->possibility_list[j])
-            children[i] = *init_node(init_cell(cell->possibility_list[j], sizeof(cell->possibility_list)/sizeof(int)));
+            children[i] = *init_node(init_cell(cell->possibility_list[j],\
+					   	sizeof(cell->possibility_list)));
 
     node->children = children;    
 }
@@ -53,23 +58,25 @@ void populate_children(TreeNode *node){
  *
  * returns: pointer to root of the tree
  */
-TreeNode *build_tree(TreeNode *crt){
-    populate_childrent(crt);
+void build_tree(TreeNode *crt){
+    populate_children(crt);
  
     int number_of_children = sizeof(crt->children)/sizeof(TreeNode);
-
+	printf("recursed.\n");
     int i;
+
     for(i=0;i<number_of_children;i++){
-        return build_tree(&(crt->children[i]));
+        build_tree(&(crt->children[i]));
     }
-    return crt;
 }
 
-/*void print_tree(TreeNode *crt, char *acc){
-    int number_of_children = sizeof(crt->children)/sizeof(TreeNode);
-
+void print_tree(TreeNode *crt){
+	printf("---------------\n");
+	printf("printing tree\n");				
+    int number_of_children = sizeof(crt->children);
     int i;
+    printf("# of children: %d\n", number_of_children);
     for(i=0;i<number_of_children;i++){
-        printf("%s %d\n", crt->cell->value);
+        printf("%d  ", crt->cell->value);
     }
-}*/
+}

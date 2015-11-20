@@ -5,10 +5,13 @@
 
 typedef struct Node{
         Puzzle *instance;
-        Puzzle *children;
+        int number_of_children;
+        struct Node *children;
 }Node;
 
 
 Node *build_tree(Puzzle *instance);
+
+int get_number_of_possibilities(Cell *cell);
 
 #endif

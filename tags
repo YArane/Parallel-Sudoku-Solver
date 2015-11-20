@@ -1,0 +1,112 @@
+	session.vim	/^imap <buffer>  <Plug>NetrwHideEdit$/;"	m
+	session.vim	/^nmap <buffer>  <Plug>NetrwHideEdit$/;"	m
+	session.vim	/^nnoremap   za$/;"	m
+	session.vim	/^imap <buffer>  <Plug>NetrwRefresh$/;"	m
+	session.vim	/^nmap <buffer>  <Plug>NetrwRefresh$/;"	m
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+,	session.vim	/^nnoremap ,  :nohlsearch$/;"	m
+,<g>	session.vim	/^map ,<g> $/;"	m
+,<h>	session.vim	/^map ,<h> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,$/;"	m
+,+	session.vim	/^nnoremap <silent> ,+ :exe "resize " . (winheight(0) * 3\/2)$/;"	m
+,-	session.vim	/^nnoremap <silent> ,- :exe "resize " . (winheight(0) * 2\/3)$/;"	m
+,a	session.vim	/^nnoremap ,a :Ag$/;"	m
+,s	session.vim	/^nnoremap ,s :mksession$/;"	m
+,u	session.vim	/^nnoremap ,u :GundoToggle$/;"	m
+0	session.vim	/^normal! 0$/;"	m
+<F1>	session.vim	/^nnoremap <buffer> <F1> :he netrw-quickhelp$/;"	m
+<Plug>NetrwBrowseX	session.vim	/^nnoremap <silent> <Plug>NetrwBrowseX :call netrw#NetrwBrowseX(expand("<cWORD>"),0)$/;"	m
+<S-Down>	session.vim	/^inoremap <buffer> <silent> <S-Down> :Nexplore$/;"	m
+<S-Down>	session.vim	/^nnoremap <buffer> <silent> <S-Down> :Nexplore$/;"	m
+<S-Up>	session.vim	/^inoremap <buffer> <silent> <S-Up> :Pexplore$/;"	m
+<S-Up>	session.vim	/^nnoremap <buffer> <silent> <S-Up> :Pexplore$/;"	m
+C	session.vim	/^inoremap <buffer> <silent> C :let g:netrw_chgwin= winnr()$/;"	m
+C	session.vim	/^nnoremap <buffer> <silent> C :let g:netrw_chgwin= winnr()$/;"	m
+CELL_H	puzzle_structs/cell.h	2;"	d
+Cell	puzzle_structs/cell.h	/^typedef struct Cell{$/;"	s
+Cell	puzzle_structs/cell.h	/^} Cell;$/;"	t	typeref:struct:Cell
+DECISION_TREE_H	decision_tree/decision_tree.h	2;"	d
+HINTS	puzzle_structs/puzzle_generator.h	7;"	d
+Node	decision_tree/decision_tree.h	/^typedef struct Node{$/;"	s
+Node	decision_tree/decision_tree.h	/^}Node;$/;"	t	typeref:struct:Node
+PUZZLE_GENERATOR_H	puzzle_structs/puzzle_generator.h	2;"	d
+PUZZLE_H	puzzle_structs/puzzle.h	2;"	d
+Puzzle	puzzle_structs/puzzle.h	/^typedef struct Puzzle{$/;"	s
+Puzzle	puzzle_structs/puzzle.h	/^}Puzzle;$/;"	t	typeref:struct:Puzzle
+SHUFF	puzzle_structs/puzzle_generator.h	6;"	d
+SessionLoad	session.vim	/^let SessionLoad = 1$/;"	v
+TREE_NODE_H	tree_structs/tree_node.h	2;"	d
+TreeNode	tree_structs/tree_node.h	/^typedef struct TreeNode{$/;"	s
+TreeNode	tree_structs/tree_node.h	/^} TreeNode;$/;"	t	typeref:struct:TreeNode
+assign_children	decision_tree/decision_tree.c	/^Node *assign_children(Puzzle *instance, Cell *cell, int *number_of_children){$/;"	f
+build_tree	decision_tree/decision_tree.c	/^Node *build_tree(Puzzle *instance){$/;"	f
+build_tree	tree_structs/tree_node.c	/^void build_tree(TreeNode *crt){$/;"	f
+c	session.vim	/^inoremap <buffer> <silent> c :exe "keepjumps lcd ".fnameescape(b:netrw_curdir)$/;"	m
+c	session.vim	/^nnoremap <buffer> <silent> c :exe "keepjumps lcd ".fnameescape(b:netrw_curdir)$/;"	m
+cell	tree_structs/tree_node.h	/^    Cell *cell;$/;"	m	struct:TreeNode
+cells	puzzle_structs/puzzle.h	/^    Cell *cells;$/;"	m	struct:Puzzle
+children	decision_tree/decision_tree.h	/^        struct Node *children;$/;"	m	struct:Node	typeref:struct:Node::Node
+children	tree_structs/tree_node.h	/^    struct TreeNode *children;$/;"	m	struct:TreeNode	typeref:struct:TreeNode::TreeNode
+col	puzzle_structs/cell.h	/^    int col;$/;"	m	struct:Cell
+construct_tree	decision_tree/decision_tree.c	/^Node *construct_tree(Node *crt, Cell *sorted_list){$/;"	f
+convert_hash_to_list	decision_tree/decision_tree.c	/^Cell *convert_hash_to_list(int *hash, Puzzle *instance){$/;"	f
+create_puzzle	puzzle_structs/puzzle_generator.c	/^Puzzle *create_puzzle(Puzzle *puzzle) {$/;"	f
+fill_in_obvious_cells	puzzle_structs/puzzle.c	/^void fill_in_obvious_cells(Puzzle *puzzle){$/;"	f
+fill_possibilities_with_zeros	puzzle_structs/cell.c	/^void fill_possibilities_with_zeros(Cell *cell){$/;"	f
+fill_possibility_lists	puzzle_structs/puzzle.c	/^void fill_possibility_lists(Puzzle *puzzle) {$/;"	f
+find_square_row_and_col	puzzle_structs/puzzle.c	/^void *find_square_row_and_col(int row, int col, int *square_row, int *square_col, Puzzle *puzzle) {$/;"	f
+gV	session.vim	/^nnoremap gV `[v`]$/;"	m
+get_cell	puzzle_structs/puzzle.c	/^Cell *get_cell(int row, int col, Puzzle *puzzle) {$/;"	f
+get_cell_column	puzzle_structs/puzzle.c	/^int get_cell_column(Puzzle *puzzle, Cell *cell){$/;"	f
+get_cell_row	puzzle_structs/puzzle.c	/^int get_cell_row(Puzzle *puzzle, Cell *cell){$/;"	f
+get_cell_value	puzzle_structs/puzzle.c	/^int get_cell_value(int row, int col, Puzzle *puzzle) {$/;"	f
+get_next_available_bucket	decision_tree/decision_tree.c	/^int get_next_available_bucket(int *hash, int key){$/;"	f
+get_number_of_possibilities	decision_tree/decision_tree.c	/^int get_number_of_possibilities(Cell *cell){$/;"	f
+get_number_of_unknowns	decision_tree/decision_tree.c	/^int get_number_of_unknowns(Puzzle *instance){$/;"	f
+get_possibility	decision_tree/decision_tree.c	/^int get_possibility(Cell *cell, int index){$/;"	f
+gx	session.vim	/^nmap gx <Plug>NetrwBrowseX$/;"	m
+hash	decision_tree/decision_tree.c	/^void hash(int *hash, int key, Puzzle *instance){$/;"	f
+hash_cells	decision_tree/decision_tree.c	/^int *hash_cells(Puzzle *instance){$/;"	f
+init_cell	puzzle_structs/cell.c	/^Cell *init_cell(int value, int n){$/;"	f
+init_node	tree_structs/tree_node.c	/^TreeNode *init_node(Cell *cell){$/;"	f
+init_puzzle	puzzle_structs/puzzle.c	/^Puzzle *init_puzzle(int n){$/;"	f
+init_root	decision_tree/decision_tree.c	/^Node *init_root(Puzzle *instance, Cell *cell){$/;"	f
+insert_some_empty_cells	puzzle_solver/sudoku_solver.c	/^void insert_some_empty_cells(Puzzle *puzzle) {$/;"	f
+instance	decision_tree/decision_tree.h	/^        Puzzle *instance;$/;"	m	struct:Node
+is_obvious	puzzle_structs/puzzle.c	/^int is_obvious(Cell *cell){$/;"	f
+j	session.vim	/^nnoremap j gj$/;"	m
+jk	session.vim	/^inoremap jk $/;"	m
+k	session.vim	/^nnoremap k gk$/;"	m
+main	decision_tree/test.c	/^int main(int argc, char *argv[]){$/;"	f
+main	puzzle_solver/sudoku_solver.c	/^int main(int argc, char **argv) {$/;"	f
+main	puzzle_structs/test_main.c	/^int main(int argc, char **argv) {$/;"	f
+number_of_children	decision_tree/decision_tree.h	/^        int number_of_children;$/;"	m	struct:Node
+number_of_possibilities	tree_structs/tree_node.c	/^int number_of_possibilities(Cell *cell){$/;"	f
+populate_children	tree_structs/tree_node.c	/^void populate_children(TreeNode *node){$/;"	f
+possibility_list	puzzle_structs/cell.h	/^    int *possibility_list;$/;"	m	struct:Cell
+print_possibility_list	puzzle_structs/puzzle.c	/^void print_possibility_list(int row, int col, Puzzle *puzzle) {$/;"	f
+print_puzzle	puzzle_structs/puzzle.c	/^void print_puzzle(Puzzle *puzzle) {$/;"	f
+print_puzzle_by_level	puzzle_structs/puzzle.c	/^void print_puzzle_by_level(Puzzle *puzzle, int level) {$/;"	f
+print_tree	decision_tree/decision_tree.c	/^void print_tree(Node *crt, int level){$/;"	f
+print_tree	tree_structs/tree_node.c	/^void print_tree(TreeNode *crt){$/;"	f
+puzzle_has_contradiction	puzzle_structs/puzzle.c	/^int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {$/;"	f
+read_matrix_data	puzzle_solver/sudoku_solver.c	/^void *read_matrix_data(char *filename, Puzzle *puzzle){$/;"	f
+row	puzzle_structs/cell.h	/^    int row;$/;"	m	struct:Cell
+s:cpo_save	session.vim	/^let s:cpo_save=&cpo$/;"	v
+s:l	session.vim	/^let s:l = 11 - ((10 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	session.vim	/^let s:l = 12 - ((11 * winheight(0) + 19) \/ 39)$/;"	v
+s:so_save	session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
+s:sx	session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:wipebuf	session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+set_cell_value	puzzle_structs/puzzle.c	/^void set_cell_value(int row, int col, Puzzle *puzzle, int new_val) {$/;"	f
+size	puzzle_structs/puzzle.h	/^    int size;$/;"	m	struct:Puzzle
+source	puzzle_structs/puzzle_generator.c	/^static int source[81] ={$/;"	v	file:
+swap_col	puzzle_structs/puzzle_generator.c	/^void swap_col(int from, int to)$/;"	f
+swap_row	puzzle_structs/puzzle_generator.c	/^void swap_row(int from, int to)$/;"	f
+unknown	puzzle_structs/cell.h	3;"	d
+value	puzzle_structs/cell.h	/^    int value;$/;"	m	struct:Cell
+zt	session.vim	/^normal! zt$/;"	m
