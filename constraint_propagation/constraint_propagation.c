@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../puzzle_structs/cell.h"
+#include "../puzzle_structs/puzzle.h"
+
+void lone_ranger(Puzzle *p);
+void lone_ranger_row_and_col(int row, int col, Puzzle *p);
+void lone_ranger_subgrid(int row, int col, Puzzle *p);
+
 
 /*
  * Function: lone_ranger
@@ -20,7 +27,6 @@
 			lone_ranger_subgrid(i, i, p);
 	}
 }
-
 
 /* 
  * Function: lone_ranger_row_and_col
