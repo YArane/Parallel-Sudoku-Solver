@@ -6,6 +6,7 @@
 typedef struct Node{
         Puzzle *instance;
         int number_of_children;
+        int level;
         struct Node *children;
 }Node;
 
@@ -13,5 +14,23 @@ typedef struct Node{
 Node *build_tree(Puzzle *instance);
 
 int get_number_of_possibilities(Cell *cell);
+
+typedef struct QueueNode{
+    Node *value;
+    struct QueueNode *next;
+}QueueNode;
+
+typedef struct Queue{
+    QueueNode *head, *tail;
+    int size;
+}Queue;
+
+void enqueue(Queue *queue, Node *value, int level);
+
+Node *dequeue(Queue *queue);
+        
+int is_empty(Queue *queue);
+
+void print_queue(Queue *queue);
 
 #endif

@@ -11,11 +11,12 @@ Node *construct_tree(Node *crt, Cell *sorted_list);
 Node *assign_children(Puzzle *instance, Cell *cell, int *number_of_children);
 Node *init_root(Puzzle *instance, Cell *cell);
 void print_tree(Node *root, int level);
+void bfs(Node *root, Cell *sorted_list);
+int check_puzzle_validity(Puzzle *instance);
 
 Node *build_tree(Puzzle *instance){
     int recheck = 1;
     while(recheck == 1){
-            printf("recheck\n");
             int i;
             recheck = 0;
             for(i=0;i<instance->size*instance->size;i++){
@@ -26,13 +27,6 @@ Node *build_tree(Puzzle *instance){
                 }
             }
     }
-    int j, k;
-    for(j=0;j<instance->size;j++){
-            for(k=0;k<instance->size;k++){
-                print_possibility_list(j, k, instance);
-            }
-    }
-    
 
     printf("Building Tree..\n");
      
@@ -40,22 +34,39 @@ Node *build_tree(Puzzle *instance){
     int *hash = hash_cells(instance);
     Cell *sorted_list = convert_hash_to_list(hash, instance);
 
-    int i=0;
-    while((sorted_list+i)->value != -99){
-        printf("**\n");
-        printf("sorted_list [%d][%d]: %d\n", (sorted_list+i)->row, (sorted_list+i)->col, get_number_of_possibilities(sorted_list + i));
-        i++;
-    }
-
     print_puzzle(instance);
     
-    if(sorted_list->value != -99){
-        Node *root = init_root(instance, sorted_list);
-        printf("init root success\n");
-        construct_tree(root, ++sorted_list);
-        printf("finished building tree\n");
-        print_tree(root, 0);
+    Node root = {instance, 0, 0, NULL};
+    bfs(&root, sorted_list);
+}
+
+void bfs(Node *root, Cell *sorted_list){
+    Queue queue = {};
+
+    enqueue(&queue, root, 0);
+    int previous_level = 0;
+    while(!is_empty(&queue) && sorted_list->value != -99){
+        Node *crt = dequeue(&queue);
+        if(check_puzzle_validity(crt->instance)){
+            crt->children = assign_children(crt->instance, sorted_list, &crt->number_of_children);
+            int i;
+            for(i=0;i<get_number_of_possibilities(sorted_list);i++){
+                if(check_puzzle_validity(crt->children[i].instance)==1 && get_number_of_unknowns(crt->children[i].instance) == 0){
+                    printf("FOUND SOLUTION :D\n");
+                    print_puzzle(crt->children[i].instance);
+                    return;
+                }
+               // print_puzzle_by_level(crt->children[i].instance, previous_level);
+                enqueue(&queue, &crt->children[i], crt->level+1);
+            } 
+        }
+        if(crt->level != previous_level){
+            printf("level: %d\n", crt->level);
+            previous_level = crt->level;
+            sorted_list++;
+        }
     }
+    
 }
 
 void print_tree(Node *crt, int level){
@@ -69,27 +80,20 @@ void print_tree(Node *crt, int level){
 }
 
 
-Node *construct_tree(Node *crt, Cell *sorted_list){
-    /*printf("Constructing tree\nBegininning with cell: [%d][%d]\n which has possibility list: \n", sorted_list->row, sorted_list->col);
-    for(i=1;i<10;i++){
-        printf("%d ", sorted_list->possibility_list[i]);
-    }*/
-    int i;
-    if(sorted_list->value == -99){
-        printf("end of tree.\n");
-        return;
-    }    
-    if(get_number_of_possibilities(sorted_list) == 0){
-            construct_tree(crt, sorted_list+1);
-            return;
+int check_puzzle_validity(Puzzle *instance){
+    int m, n;
+    int correct_puzzle = 1;
+    for(m = 0;m<instance->size;m++){
+        for(n = 0;n<instance->size;n++){
+           // if(get_cell(m, n, instance)->value != -1){
+                if(puzzle_has_contradiction(m, n, instance)){
+                        correct_puzzle = 0;
+                }
+            //}
+        }
     }
-    int number_of_children = get_number_of_possibilities(sorted_list);
-    for(i=0;i<number_of_children;i++){
-       crt->children[i].children = assign_children((crt->children[i].instance), &sorted_list[0], &crt->children[i].number_of_children); 
-       return construct_tree(&crt->children[i], sorted_list+1);
-    }
-}
-
+    return correct_puzzle;
+}   
 
 int get_possibility(Cell *cell, int index){
    int i, j; 
@@ -129,17 +133,6 @@ Node *assign_children(Puzzle *instance, Cell *cell, int *number_of_children){
     return children_node;
 }
 
-Node *init_root(Puzzle *instance, Cell *cell){
-    Node *root;
-    root = malloc(sizeof(Node));
-
-    root->instance = NULL;
-    int i;
-    root->children = assign_children(instance, cell, &root->number_of_children);
-
-    return root;
-}
-
 int get_number_of_possibilities(Cell *cell){
     int count = 0;
     int* list = cell->possibility_list;
@@ -171,7 +164,6 @@ Cell *convert_hash_to_list(int *hash, Puzzle *instance){
     for(i=0, j=0;i<instance->size*instance->size*number_of_unknowns;i++){
         if(hash[i] != -1){
                 sorted_list[j++] = instance->cells[hash[i]];
-                printf("[%d][%d]: %d\n", sorted_list[j-1].row, sorted_list[j-1].col, get_number_of_possibilities(&sorted_list[j-1]));
         }
     } 
     sorted_list[j].value = -99;
@@ -210,3 +202,34 @@ int *hash_cells(Puzzle *instance){
 
     return hashed_cells;
 }
+
+void enqueue(Queue *queue, Node *value, int level){
+     QueueNode *node = malloc(sizeof(QueueNode));
+     value->level = level;
+     node->value = value; 
+     node->next = NULL;
+ 
+     if(queue->tail){
+         queue->tail->next = node;
+     }else{
+         queue->head = node;
+     }
+     queue->tail = node;
+     queue->size++;
+}
+ 
+ Node *dequeue(Queue *queue){
+     Node *top = queue->head->value;
+     QueueNode *second = queue->head->next;
+     free(queue->head);
+     queue->head = second;
+     if(!queue->head){
+             queue->tail = NULL;
+     }
+     queue->size--;
+     return top;
+ }
+ 
+ int is_empty(Queue *queue){
+     return (queue->head == NULL);
+ }

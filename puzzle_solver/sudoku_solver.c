@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
   fill_possibility_lists(puzzle);
   //fill_in_obvious_cells(puzzle);
-  print_puzzle(puzzle);
+/*  print_puzzle(puzzle);
 
   printf("ORIGINAL LIST:\n");
 
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
           for(j=0;j<9;j++){
                   print_possibility_list(i, j, puzzle);
           }
-  }
+  }*/
 
 
   Node *node = build_tree(puzzle); 

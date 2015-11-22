@@ -114,7 +114,7 @@ int get_cell_value(int row, int col, Puzzle *puzzle) {
  *
  */
 void set_cell_value(int row, int col, Puzzle *puzzle, int new_val) {
-  printf("SETTING CELL [%d][%d] to %d\n", row, col, new_val);
+  //printf("SETTING CELL [%d][%d] to %d\n", row, col, new_val);
   Cell *cell = get_cell(row, col, puzzle);
   cell->value = new_val;
   int i;
@@ -143,7 +143,6 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
 
   int newest_element_value = newest_element->value;
   int size = puzzle->size;
-  printf("Cell Value %d\n", newest_element_value);
 
   // used to find the 3x3 square that will be checked for validity
   //TODO: probably not the best way to check square validity, but it works!
@@ -158,18 +157,21 @@ int puzzle_has_contradiction(int row, int col, Puzzle *puzzle) {
     // check all elements on row
     row_val = get_cell(row, i, puzzle)->value;
     if (row_val != -1 && row_val == newest_element_value && i != col) {
+      //printf("--> found contradicion! cell [%d][%d]\n", row_val, i); 
       return 1;
     }
 
     //check all elements on col
     col_val = get_cell(i, col, puzzle)->value;
     if (col_val != -1 && !col_val && col_val == newest_element_value && i != row) {
+      //printf("--> found contradicion! cell [%d][%d]\n", row_val, i); 
       return 1;
     }
 
     //check 3x3 square
     grid_val = get_cell(j, k, puzzle)->value;
-    if (row_val != -1 && !grid_val && grid_val == newest_element_value && j != row && k != col) {
+    if (grid_val != -1 && !grid_val && grid_val == newest_element_value && j != row && k != col) {
+      //printf("--> found contradicion! cell [%d][%d]\n", row_val, i); 
       return 1;
     }
 
