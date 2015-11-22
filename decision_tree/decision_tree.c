@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <omp.h>
+#include <sys/time.h>
 #include "decision_tree.h"
 
 
@@ -36,8 +38,18 @@ Node *build_tree(Puzzle *instance){
 
     print_puzzle(instance);
     
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+
     Node root = {instance, 0, 0, NULL};
     bfs(&root, sorted_list);
+
+    gettimeofday(&end, NULL);
+    
+    printf("\n\nAlgorithm's computational part duration :%ld\n", \
+                                          ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
+
 }
 
 void bfs(Node *root, Cell *sorted_list){
@@ -50,6 +62,9 @@ void bfs(Node *root, Cell *sorted_list){
         if(check_puzzle_validity(crt->instance)){
             crt->children = assign_children(crt->instance, sorted_list, &crt->number_of_children);
             int i;
+            #pragma omp parallel num_threads(4) shared(queue)
+            {
+            #pragma omp for
             for(i=0;i<get_number_of_possibilities(sorted_list);i++){
                 if(check_puzzle_validity(crt->children[i].instance)==1 && get_number_of_unknowns(crt->children[i].instance) == 0){
                     printf("FOUND SOLUTION :D\n");
@@ -58,6 +73,7 @@ void bfs(Node *root, Cell *sorted_list){
                 }
                // print_puzzle_by_level(crt->children[i].instance, previous_level);
                 enqueue(&queue, &crt->children[i], crt->level+1);
+            }
             } 
         }
         if(crt->level != previous_level){
