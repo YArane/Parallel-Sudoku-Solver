@@ -3,6 +3,7 @@
 #include "../puzzle_structs/puzzle_generator.h"
 //#include "../tree_structs/tree_node.h"
 #include "../decision_tree/decision_tree.h"
+#include <mpi.h>
 
 /*
 ==============================================
