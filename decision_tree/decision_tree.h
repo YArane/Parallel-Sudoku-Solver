@@ -11,7 +11,7 @@ typedef struct Node{
 }Node;
 
 
-Node *build_tree(Puzzle *instance);
+Node *build_tree(Puzzle *instance, int *rank, int *np);
 
 int get_number_of_possibilities(Cell *cell);
 
@@ -32,5 +32,7 @@ Node *dequeue(Queue *queue);
 int is_empty(Queue *queue);
 
 void print_queue(Queue *queue);
+
+void *create_mpi_node(int num_children);
 
 #endif

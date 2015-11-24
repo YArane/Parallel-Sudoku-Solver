@@ -34,4 +34,6 @@ int get_cell_row(Puzzle *puzzle, Cell *cell);
 
 int get_cell_column(Puzzle *puzzle, Cell *cell);
 
+void *create_mpi_puzzle();
+
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "puzzle.h"
+#include <mpi.h>
 
 
 /* 
@@ -403,3 +404,21 @@ void print_puzzle_by_level(Puzzle *puzzle, int level) {
    }
    printf("\n");
  }
+
+
+
+void *create_mpi_puzzle(){
+    int num_items = 2;
+    int block_length[2] = {1, 4};
+    MPI_Datatype types[4] = {MPI_INT, create_mpi_cell()};
+    MPI_Datatype mpi_puzzle;
+    MPI_Aint offsets[2];
+    
+    offsets[0] = offsetof(Puzzle, size);
+    offsets[1] = offsetof(Puzzle, cells);
+
+    MPI_Type_create_struct(num_items, block_length, offsets, types, &mpi_puzzle);
+    MPI_Type_commit(&mpi_puzzle);
+
+    return mpi_puzzle;
+}

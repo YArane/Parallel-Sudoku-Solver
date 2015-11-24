@@ -14,12 +14,29 @@
 void insert_some_empty_cells(Puzzle *puzzle);
 void *read_matrix_data(char *filename, Puzzle *puzzle);
 
+
 /* MAIN METHOD */
 
 int main(int argc, char **argv) {
+  
+  int rank, np;      
+  Puzzle *puzzle;
+  
+  //initialize MPI
+  if(MPI_SUCCESS != MPI_Init(&argc, &argv)){
+  	printf("error initializing MPI.\n");
+  	exit(-1);	
+  }
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &np);
 
-  Puzzle *puzzle = init_puzzle(9);
-  /*puzzle = */create_puzzle(puzzle);
+    if(rank == 0){
+
+
+           MPI_Datatype node = create_mpi_node(1); 
+
+  puzzle = init_puzzle(9);
+  create_puzzle(puzzle);
 
   print_puzzle(puzzle);
 
@@ -34,20 +51,14 @@ int main(int argc, char **argv) {
   }  
 
   fill_possibility_lists(puzzle);
-  //fill_in_obvious_cells(puzzle);
-/*  print_puzzle(puzzle);
+    }
+  Node *node = build_tree(puzzle, &rank, &np); 
 
-  printf("ORIGINAL LIST:\n");
-
-  int i, j;
-  for(i=0;i<9;i++){
-          for(j=0;j<9;j++){
-                  print_possibility_list(i, j, puzzle);
-          }
-  }*/
-
-
-  Node *node = build_tree(puzzle); 
+  //terminate MPI
+  if(MPI_SUCCESS != MPI_Finalize()){
+  	printf("error terminating MPI.\n");
+  	exit(-1);
+  }
 
   return 0;
 }

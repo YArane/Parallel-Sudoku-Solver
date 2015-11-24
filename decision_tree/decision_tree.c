@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <omp.h>
+#include <mpi.h>
 #include <sys/time.h>
 #include "decision_tree.h"
 
@@ -16,7 +17,31 @@ void print_tree(Node *root, int level);
 void bfs(Node *root, Cell *sorted_list);
 int check_puzzle_validity(Puzzle *instance);
 
-Node *build_tree(Puzzle *instance){
+void *create_mpi_node(int num_children){
+         // MPI struct
+          int num_items = 4;
+          int block_length[4] = {1, 1, 1, num_children};
+          MPI_Datatype mpi_node;                                      
+          MPI_Datatype types[4] = {create_mpi_puzzle(), MPI_INT, MPI_INT, mpi_node};
+          MPI_Aint offsets[4];                                     
+          offsets[0] = (MPI_Aint)offsetof(Node, instance);          
+          offsets[1] = (MPI_Aint)offsetof(Node, number_of_children);
+          offsets[2] = (MPI_Aint)offsetof(Node, level);            
+          offsets[3] = (MPI_Aint)offsetof(Node, children);
+                                                               
+          MPI_Type_create_struct(num_items, block_length, offsets, types, &mpi_node); 
+          MPI_Type_commit(&mpi_node);                                                         
+          return mpi_node;       
+}
+
+Node *build_tree(Puzzle *instance, int *rank, int *np){
+
+    struct timeval start, end;
+    Node root;
+    Cell *sorted_list;
+
+    if(*rank == 0){
+
     int recheck = 1;
     while(recheck == 1){
             int i;
@@ -34,14 +59,16 @@ Node *build_tree(Puzzle *instance){
      
     // sort cells in increasing order of possibility list size
     int *hash = hash_cells(instance);
-    Cell *sorted_list = convert_hash_to_list(hash, instance);
+    sorted_list = convert_hash_to_list(hash, instance);
 
     print_puzzle(instance);
     
-    struct timeval start, end;
     gettimeofday(&start, NULL);
 
-    Node root = {instance, 0, 0, NULL};
+    root = (Node){instance, 0, 0, NULL};
+
+    }
+
     bfs(&root, sorted_list);
 
     gettimeofday(&end, NULL);
@@ -55,10 +82,12 @@ Node *build_tree(Puzzle *instance){
 void bfs(Node *root, Cell *sorted_list){
     Queue queue = {};
 
+
     enqueue(&queue, root, 0);
     int previous_level = 0;
     while(!is_empty(&queue) && sorted_list->value != -99){
         Node *crt = dequeue(&queue);
+        // request job from master
         if(check_puzzle_validity(crt->instance)){
             crt->children = assign_children(crt->instance, sorted_list, &crt->number_of_children);
             int i;
@@ -71,10 +100,10 @@ void bfs(Node *root, Cell *sorted_list){
                     print_puzzle(crt->children[i].instance);
                     return;
                 }
+                }
                // print_puzzle_by_level(crt->children[i].instance, previous_level);
                 enqueue(&queue, &crt->children[i], crt->level+1);
             }
-            } 
         }
         if(crt->level != previous_level){
             printf("level: %d\n", crt->level);
@@ -83,6 +112,10 @@ void bfs(Node *root, Cell *sorted_list){
         }
     }
     
+}
+
+void get_job(){
+  // slaves request job from master  
 }
 
 void print_tree(Node *crt, int level){
@@ -188,10 +221,8 @@ Cell *convert_hash_to_list(int *hash, Puzzle *instance){
 
 int get_next_available_bucket(int *hash, int key){
    int i;
-   for(i=81*(key-1);i<81*(key);i++){
         if(hash[i] == -1)
                 return i;
-   }
    printf("no more spots in hash\n");
    return -1;
 }
