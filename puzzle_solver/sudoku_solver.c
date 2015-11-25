@@ -32,11 +32,17 @@ int main(int argc, char **argv) {
 
     if(rank == 0){
 
-
-           MPI_Datatype node = create_mpi_node(1); 
-
   puzzle = init_puzzle(9);
   create_puzzle(puzzle);
+            
+
+           MPI_Datatype node = create_mpi_node(1); 
+    /*        node->instance = puzzle;
+            node->number_of_children = 1;
+            node->level = 0;
+            node->children = puzzle;*/
+            
+           MPI_Send(&node, 1, create_mpi_node(1), 1, 0, MPI_COMM_WORLD);
 
   print_puzzle(puzzle);
 
@@ -52,6 +58,13 @@ int main(int argc, char **argv) {
 
   fill_possibility_lists(puzzle);
     }
+
+    if(rank == 1){
+        printf("RANK 1:\n");
+        MPI_Datatype node = create_mpi_node(1);
+        MPI_Recv(&node, 1, create_mpi_node(1), 0, 0, MPI_COMM_WORLD,  NULL);
+    }
+
   Node *node = build_tree(puzzle, &rank, &np); 
 
   //terminate MPI
