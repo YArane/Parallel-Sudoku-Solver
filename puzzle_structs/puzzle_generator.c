@@ -15,6 +15,43 @@ static int source[81] ={
   6,2,3,8,7,4,9,5,1
 };
 
+void make_puzzle();
+
+int main(int argc, char **argv){
+
+        make_puzzle();           
+
+                int i;
+
+            for(i=1;i<=81;i++){
+                    printf("%d", source[i-1]);
+                    if(i%9 == 0 && i != 0){
+                        printf("\n");
+                    }
+            }
+            printf("\n");
+            return 1;
+
+      
+        /*     ~~ write puzzle to file ~~    */
+        FILE *file;
+        if(!(file=fopen(argv[1], "w"))){
+            printf("could not write to file.\n");
+            return -1;
+        }
+
+        for(i=0;i<81;i++){
+              char cell;
+            sprintf(&cell, "%d", source[i]);
+            fputs(&cell, file);
+        }
+
+
+        fclose(file);
+        
+        return 1;
+}
+
 
 Puzzle *create_puzzle(Puzzle *puzzle) {
   srand(time(NULL));
@@ -86,5 +123,41 @@ void swap_col(int from, int to)
     *ptr2 = temp;
     ptr1+=9;
     ptr2+=9;
+  }
+}
+
+
+void make_puzzle() {
+  srand(time(NULL));
+
+  int i, j, swap, trio;
+  for(j=0; j<SHUFF; j++){
+
+    trio = (rand() % 3)*3;
+    swap = rand() & 1;
+
+    switch(rand() % 6){
+      /* swap rows */
+      case 0:
+        swap_row(trio+0, swap ? trio+1 : trio+2);
+        break;
+      case 1:
+        swap_row(trio+1, swap ? trio+0 : trio+2);
+        break;
+      case 2:
+        swap_row(trio+2, swap ? trio+0 : trio+1);
+        break;
+
+      /* swap cols */
+      case 3:
+        swap_col(trio+0, swap ? trio+1 : trio+2);
+        break;
+      case 4:
+        swap_col(trio+1, swap ? trio+0 : trio+2);
+        break;
+      case 5:
+        swap_col(trio+2, swap ? trio+0 : trio+1);
+        break;
+    }
   }
 }
