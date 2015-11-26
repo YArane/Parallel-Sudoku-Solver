@@ -4,6 +4,8 @@
 
 static int size;
 
+int get_number_possibilities(int cell[], int i);
+
 int main(int argc, char **argv){
     
         /*     ~~ init MPI ~~    */
@@ -40,6 +42,10 @@ int main(int argc, char **argv){
             }
 
             fclose(file);
+            
+            for(i=0;i<size;i++){
+                printf("%d\n", get_number_of_possibilities(cell, i));
+            }
                 
         }
 
@@ -50,4 +56,33 @@ int main(int argc, char **argv){
             printf("error terminating MPI.\n");
             exit(-1);
         }
+}
+
+
+int get_number_of_possibilities(int cell[], int i){
+    int possibilities[size+1];
+    int count = 0;
+    int k;
+    for(k=1;k<size;k++){
+        possibilities[k] = 1;
+    }
+    int row = col = i;
+    do{
+        // iterate over rows
+        if(possibilities[cell[row]] == 1){
+            possibilities[cell[row]] = 0;
+            count++; 
+        }
+        // iterate over columns
+        if(possibilities[cell[col]] == 1){
+            possibilties[cell[col]] = 0;
+            count++
+        } 
+
+        row = (row+1) % size;
+        col = (col+size) % (size*size);
+
+    }while(j%size != 0);
+    
+    return count; 
 }
