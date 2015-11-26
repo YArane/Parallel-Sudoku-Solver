@@ -21,8 +21,10 @@ int main(int argc, char **argv){
 
         if(rank == 0){
             /*     ~~ Read Matrix ~~    */
+
+
             FILE *file;
-            if(!(file = fopen(argv[1], "r"))){
+            if(!(file = fopen(argv[1], "r")) || argc != 3){
                 printf("usage: %s [matrix.txt], [size]\n", argv[0]);
                 return -1;
             }
