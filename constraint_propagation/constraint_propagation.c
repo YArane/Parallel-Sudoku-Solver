@@ -15,6 +15,7 @@ int possibility_lists_equal(int *p1, int *p2);
 int rank_possibility_list(int *p1);
 void eliminate_naked_subset_col(Puzzle *p, int col, int *subset, int *locations);
 void eliminate_naked_subset_row(Puzzle *p, int row, int *subset, int *locations);
+void eliminate_naked_subset_subgrid(Puzzle *p, int rowcol, int *subset, int *locations);
 
 
 /*
@@ -62,13 +63,13 @@ void naked_subset_row_and_col(int rowcol, Puzzle *p)
 	for(row=0; row<9; row++)
 	{
 		match_count = 0;
-		scan = get_cell(row, col);
+		scan = get_cell(row, col, p);
 		subset = scan->possibility_list;
 		for(i=0; i<9; i++)
 			locations[i] = 0;
 		for(row2=0; row2<9; row2++) //compare this subset against all other in the column
 		{
-			cmp = get_cell(row2, col);
+			cmp = get_cell(row2, col, p);
 			subset2 = cmp->possibility_list;
 			if(possibility_lists_equal(subset, subset2))
 			{
@@ -79,7 +80,7 @@ void naked_subset_row_and_col(int rowcol, Puzzle *p)
 		if(match_count == rank_possibility_list(subset)) //we have discovered a naked subset
 		// !!!
 		{
-			eliminate_naked_subset_col(Puzzle *p, int col, int *subset, int *locations);
+			eliminate_naked_subset_col(p, col, subset, locations);
 		}
 	}
 
@@ -88,13 +89,13 @@ void naked_subset_row_and_col(int rowcol, Puzzle *p)
 	for(col=0; col<9; col++)
 	{
 		match_count = 0;
-		scan = get_cell(row, col);
+		scan = get_cell(row, col, p);
 		subset = scan->possibility_list;
 		for(i=0; i<9; i++)
 			locations[i] = 0;
 		for(col2=0; col2<9; col2++) //compare this subset against all other in the row
 		{
-			cmp = get_cell(row, col2);
+			cmp = get_cell(row, col2, p);
 			subset2 = cmp->possibility_list;
 			if(possibility_lists_equal(subset, subset2))
 			{
@@ -105,7 +106,7 @@ void naked_subset_row_and_col(int rowcol, Puzzle *p)
 		if(match_count == rank_possibility_list(subset)) //we have discovered a naked subset
 		// !!!
 		{
-			eliminate_naked_subset_row(Puzzle *p, int row, int *subset, int *locations);
+			eliminate_naked_subset_row(p, row, subset, locations);
 		}
 	}
 }
@@ -129,7 +130,7 @@ void naked_subset_subgrid(int rowcol, Puzzle *p)
 		for(col=square_col; col<square_col+3; col++)
 		{
 			match_count = 0;
-			scan = get_cell(row, col);
+			scan = get_cell(row, col, p);
 			subset = scan->possibility_list;
 			for(i=0; i<9; i++)
 				locations[i] = 0;
@@ -137,11 +138,11 @@ void naked_subset_subgrid(int rowcol, Puzzle *p)
 			{
 				for(col2=square_col; col2<square_col+3; col2++)
 				{
-					cmp = get_cell(row2, col2);
+					cmp = get_cell(row2, col2, p);
 					subset2 = cmp->possibility_list;
 					if(possibility_lists_equal(subset, subset2))
 					{
-						match_count++
+						match_count++;
 						locations[3*row2 + col2];
 					}
 				}
@@ -177,7 +178,7 @@ void eliminate_naked_subset_subgrid(Puzzle *p, int rowcol, int *subset, int *loc
 		{
 			if(!locations[3*row + col])
 			{
-				elim = get_cell(row, col);
+				elim = get_cell(row, col, p);
 				for(element=0; element<9; element++)
 				{
 					if(subset[element])
@@ -207,7 +208,7 @@ void eliminate_naked_subset_col(Puzzle *p, int col, int *subset, int *locations)
 	{
 		if(locations[row])
 			continue;
-		elim = get_cell(row, col);
+		elim = get_cell(row, col, p);
 		for(element=0; element<9; element++)
 		{
 			if(subset[element])
@@ -235,7 +236,7 @@ void eliminate_naked_subset_row(Puzzle *p, int row, int *subset, int *locations)
 	{
 		if(locations[col])
 			continue;
-		elim = get_cell(row, col);
+		elim = get_cell(row, col, p);
 		for(element=0; element<9; element++)
 		{
 			if(subset[element])
@@ -278,6 +279,7 @@ int possibility_lists_equal(int *p1, int *p2)
 int rank_possibility_list(int *p1)
 {
 	int count = 0;
+	int i;
 	for(i=0; i<9; i++)
 	{
 		if(p1[i])
